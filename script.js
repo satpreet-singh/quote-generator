@@ -5,28 +5,23 @@ const twitterBtn = document.querySelector("#twitter");
 const newQuoteBtn = document.querySelector("#new-quote");
 const loader = document.querySelector("#loader");
 
-// Show loader
-
-function loading() {
+function showLoadingSpinner() {
   loader.hidden = false;
   quoteContainer.hidden = true;
 }
 
-// Hide Loader
-
-function complete() {
+function removeLoadingSpinner() {
   if (!loader.hidden) {
     loader.hidden = true;
     quoteContainer.hidden = false;
   }
 }
 // Get Quote From API
-
+let errorCounter;
 async function getQuote() {
-  // Show Loader
-  loading();
+  showLoadingSpinner();
 
-  //proxy url
+  // We need to use a Proxy URL to make our API call in order to avoid CORS issue
   const apiUrl =
     "http://api.forismatic.com/api/1.0/?method=getQuote&lang=en&format=json";
 
@@ -48,10 +43,14 @@ async function getQuote() {
     }
     quoteText.innerText = data.quoteText;
 
-    // Show quote and hide loader
-    complete();
+    removeLoadingSpinner();
   } catch (error) {
-    getQuote();
+    errorCounter++;
+    if (errorCounter < 10) {
+      getQuote();
+    } else {
+      console.log("Oops , unable to fetch a quote");
+    }
   }
 }
 
